@@ -63,7 +63,6 @@ Currntly it contains:
 		- Create Plane object Given normal vector and a point:		Plane([normal_vector,point])
 											# OR
 										Plane.get_plane_given_normal_vector_and_a_point(normal_vector,point)
-
 		- Create plane through intersection of 2 planes and point:	Plane.get_plane_through_intersection_of_planes_and_a_point(plane1,plane2,point)
 		- Get Normal Vector and Constant of a Plane object: 		plane.get_normal_vector_and_constant()
 		- Planes addition: 			plane1 + plane2
