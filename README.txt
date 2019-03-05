@@ -57,9 +57,9 @@ Currntly it contains:
 
 	Methods of class Plane: (Say you have a object of class Plane 'plane')
 		- Create Plane object Given normal_vector, constant:		Plane([normal_vector,constant])
-		- Create Plane object Given 3 points in space:	Plane([point1,point2,point3])
-																			# OR
-																	Plane.get_plane_passing_through_3_points(point1,point2,point3)
+		- Create Plane object Given 3 points in space:			Plane([point1,point2,point3])
+											# OR
+										Plane.get_plane_passing_through_3_points(point1,point2,point3)
 		- Create Plane object Given normal vector and a point:		Plane([normal_vector,point])
 		- Create plane through intersection of 2 planes and point:	Plane.get_plane_through_intersection_of_planes_and_a_point(plane1,plane2,point)
 		- Get Normal Vector and Constant of a Plane object: 		plane.get_normal_vector_and_constant()
