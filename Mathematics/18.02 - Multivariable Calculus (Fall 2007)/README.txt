@@ -3,7 +3,7 @@ This directory will contain some of the 18.02 content implemented in python
 Inspired by MIT(Massachusetts Institute of Technology) course 18.02
 https://ocw.mit.edu/courses/mathematics/18-02-multivariable-calculus-fall-2007/
 
-			########### Beginning of 18.02 Implementation ############
+###################### Beginning of 18.02 Implementation #############################
 			
 - Vector: 2 classes Vector and Plane
 Methods of class Vector: (Say you have two vectors v1, v2)
@@ -45,4 +45,4 @@ Methods of class Plane: (Say you have a object of class Plane 'plane')
 	- Angle b/w 2 planes:			plane1.angle(plane2)
 
 
-				##### In Progress #####
+############################## In Progress ####################################
