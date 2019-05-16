@@ -7,11 +7,11 @@ Created on Sun Mar 17 23:54:12 2019
 
 import MultiVariable as mvar
 
-# Step1: define a function example f(x) = 3x^2 + 4x + 5
+# Step1: define a function example f(x,y) = x^y + y^4 + x^2*y + x^3*y + xy
 def f(X,Y):
     return X**4 + Y**4 + (X**2)*Y + Y*(X**3) + X*Y
 
-# If you wannd usr sins, cosines, tanh, exp, log, .......
+# If you want to usr sins, cosines, tanh, exp, log, .......
 # So you must use those functions using numpy as shown:
 '''
 import numpy as np
@@ -19,12 +19,15 @@ def f(X, Y):
     return np.sin(X)*X + np.cos(Y)*Y
 '''
 
-# Step2: set a veriable as shown
-m = mvar.MultiVariable(f, (-10,10),dx=0.5) 
+# Step2: set variables as shown
+x_axis, y_axis,  dx, dy = (-10,10) ,(-10,10) ,0.5 ,0.5
+m = mvar.MultiVariable(f, x_axis, dx, y_axis, dy)
 # Here the arguments are as follow
-# Arg1: argument 1 is a function that you defined in Step1
-# Arg2: argument 2 is the range of X and Y axes
-# Arg3: argument 3 is dx difference in b/w 2 consecutive x values(the smaller the dx is the accurate the answer is, but slower will the runtime be)
+# Arg1: function that you defined in Step1
+# Arg2: The range of X axes
+# Arg3: dx i.e. difference b/w two adjacent x's
+# Arg4: The range of Y axes
+# Arg5: dy i.e. difference b/w two adjacent y's
 
 # To plot the function
 m.plot_surface_color_3D()
