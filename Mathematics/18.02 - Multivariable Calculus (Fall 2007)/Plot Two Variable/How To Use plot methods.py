@@ -80,3 +80,21 @@ m.plot_diff_of_sequence('xy')       # plot partial derivative D_xxx
 # m.setY_limit((-5,5))     # To set limit on Y axis
 # m.setX_limit((-5,5))     # To set limit on X axis
 # m.set_axes_limit((-5,5)) # To set limit on X, Y and Z axis simentaneouslt
+
+
+# ===============================================================================
+# Plotting piecewise function
+# Say you wanna implement function
+#   f(X,Y) =   X^2 + Y^2 ; -5 <= X <0
+#              X^2 - Y^2 ;  0 <= X <=5
+
+def f(X,Y):
+    import numpy as np
+    Z = np.zeros(X.shape)
+    Z += ((X >=-10) & (X < 0))*(X**2 + Y**2) # X^2 + Y^2 ; -5 <= X <0
+    Z += ((X >= 0) & (X <=10))*(X**2 - Y**2) # X^2 - Y^2 ;  0 <= X <=5
+    return Z
+
+m = mvar.MultiVariable(f, x_axis, dx, y_axis, dy)
+
+m.plot_surface_color_3D()
