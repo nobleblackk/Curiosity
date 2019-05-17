@@ -24,7 +24,6 @@ class MultiVariable:
         self._X_axis_  = None
         self._Y_axis_  = None
         self._Z_axis_  = None
-        self._Zero_    = None
         self._Y_len_   = None
         self._X_len_   = None
         self.__initialize__()
@@ -41,13 +40,8 @@ class MultiVariable:
         self._X_axis_1D = X.copy()
         self._Y_axis_1D = Y.copy()
         X, Y = np.meshgrid(X,Y)
-        Z = np.empty(X.shape)
         self._X_axis_, self._Y_axis_ = X, Y
         self._Z_axis_ = self._function_(X,Y)
-        shape = Z.shape
-        Zero = np.empty(shape)
-        Zero.fill(0.0)
-        self._Zero_ = Zero
 
 # =============================================================================        
     
