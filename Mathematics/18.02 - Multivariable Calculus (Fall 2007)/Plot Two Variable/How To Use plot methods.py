@@ -80,34 +80,3 @@ m.plot_diff_of_sequence('xy')       # plot partial derivative D_xxx
 # m.setY_limit((-5,5))     # To set limit on Y axis
 # m.setX_limit((-5,5))     # To set limit on X axis
 # m.set_axes_limit((-5,5)) # To set limit on X, Y and Z axis simentaneouslt
-
-
-
-''' This is a way you can use 3D plot of a 2D plot to visualize the function and its derivative more clearly Shown below'''
-
-'''
-def f2(X,Y):
-    return X**4 + Y**4 + (X**2)*Y + Y*(X**3) + X*Y
-
-m = mvar.MultiVariable(f2,(-10,10),dx=0.5)
-m.plot_surface_color_3D()
-m.plot_function_wrtX(-10,plot_separately=True)
-m.plot_diff_wrtY_given_X(-10)
-for x in range(-8,10,3):
-    #m.plot_function_wrtX(x)
-    m.plot_diff_wrtY_given_X(x)
-
-m.plot_function_wrtY(-10,plot_separately=True)
-m.plot_diff_wrtX_given_Y(-10)
-for y in range(-8,10,3):
-    #m.plot_function_wrtY(y)
-    m.plot_diff_wrtX_given_Y(y)
-
-
-m.plot_function_wrtX(-10,plot_separately=True)
-for i in range(-8,10,3):
-    m.plot_function_wrtX(i)
-m.plot_function_wrtY(-10,plot_separately=True)
-for i in range(-8,10,3):
-    m.plot_function_wrtY(i)
-'''

@@ -54,9 +54,12 @@ class MultiVariable:
 
 # =============================================================================        
     
-    def plot_surface_color_3D(self, plot_separately = True):
+    def plot_surface_color_3D(self, plot_separately = True, Z = None, sequence_of_diff=''):
+        if(type(Z) == type(None)): 
+            Z = self._Z_axis_
+            sequence_of_diff=''
         if(plot_separately): plt.figure()
-        self.__plot_3D_curve__(self._X_axis_, self._Y_axis_, self._Z_axis_, self._function_.__name__)
+        self.__plot_3D_curve__(self._X_axis_, self._Y_axis_, Z, self._function_.__name__, self.__get_order_by_sequence__(sequence_of_diff))
 
     def __plot_3D_curve__(self, X, Y, Z, title,diff_order=(0,0)):
         ax = plt.gca(projection='3d')
@@ -64,8 +67,7 @@ class MultiVariable:
         if(remove_x != 0):
             Z = Z[:,:-remove_x]
             X = X[:,:-remove_x]
-            Y = Y[:,:-remove_x]
-            
+            Y = Y[:,:-remove_x]    
         if(remove_y != 0):
             Z = Z[:-remove_y,:]
             Y = Y[:-remove_y,:]
@@ -87,27 +89,33 @@ class MultiVariable:
 
 # =============================================================================        
         
-    def plot_surface_lines_3d(self, plot_separately = True):
+    def plot_surface_lines_3d(self, plot_separately = True, Z = None, sequence_of_diff=''):
+        if(type(Z) == type(None)): 
+            Z = self._Z_axis_
+            sequence_of_diff=''
         if(plot_separately): fig = plt.figure()
         ax = fig.gca(projection='3d')
-        ax.contour3D(self._X_axis_, self._Y_axis_, self._Z_axis_, 50, cmap='binary')
-        self.__plot_3D__(ax,self._function_.__name__)
+        ax.contour3D(self._X_axis_, self._Y_axis_, Z, 50, cmap='binary')
+        self.__plot_3D_curve__(self._X_axis_, self._Y_axis_, Z, self._function_.__name__, self.__get_order_by_sequence__(sequence_of_diff))
 
 # =============================================================================        
 
-    def __get_Z_wrtX__(self,x_value):
-        Z = []
-        for y in self._Y_axis_1D:
-            Z.append(self._function_(x_value,y))
-        return Z
+    def __get_Z_wrtX__(self,x_value, Z):
+        Z2 = []
+        #for y in self._Y_axis_1D:
+        #    Z.append(self._function_(x_value,y))
+        index = int(round((x_value - self._X_axis_1D[0]) / self._dx_))
+        for i in range(self._Y_len_):
+            Z2.append(Z[i][index])
+        return Z2
 
 # =============================================================================        
     
-    def __get_Z_wrtY__(self,y_value):
-        Z = []
-        for x in self._X_axis_1D:
-            Z.append(self._function_(x,y_value))
-        return Z
+    def __get_Z_wrtY__(self,y_value, Z):
+        #for x in self._X_axis_1D:
+        #    Z.append(self._function_(x,y_value))
+        index = int(round((y_value - self._Y_axis_1D[0]) / self._dy_))
+        return Z[index]
 
 # =============================================================================        
 
@@ -123,24 +131,24 @@ class MultiVariable:
 
 # =============================================================================        
 
-    def __diff_wrtX_given_Y_order_n__(self, n, y_value):
-        Z = self.__get_Z_wrtY__(y_value)
+    def __diff_wrtX_given_Y_order_n__(self, n, y_value,Z):
+        Z2 = self.__get_Z_wrtY__(y_value, Z)
         for i in range(n):
-            Z = self.__diff__(self._X_axis_1D, Z)
-        return Z
+            Z2 = self.__diff__(self._X_axis_1D, Z2)
+        return Z2
 
 # =============================================================================        
 
-    def __diff_wrtY_given_X_order_n__(self, n, x_value):
-        Z = self.__get_Z_wrtX__(x_value)
+    def __diff_wrtY_given_X_order_n__(self, n, x_value, Z):
+        Z2 = self.__get_Z_wrtX__(x_value, Z)
         for i in range(n):
-            Z = self.__diff__(self._Y_axis_1D, Z)
-        return Z
+            Z2 = self.__diff__(self._Y_axis_1D, Z2)
+        return Z2
 
 # =============================================================================        
 
 
-    def __plot_function_wrt__(self, axis, value, wrt, Z, _label, diff_order = 0, plot_separately = True):
+    def __plot_function_wrt__(self, axis, value, wrt, Z, _label, diff_order, plot_separately):
         if(plot_separately):
             fig = plt.figure()
             ax = fig.gca(projection='3d')
@@ -154,72 +162,77 @@ class MultiVariable:
 
 # =============================================================================        
     
-    def plot_function_wrtX(self,x_value, plot_2D_or_3D = '3D', plot_separately = True):
-        Z = self.__get_Z_wrtX__(x_value)
+    def plot_function_wrtX(self,x_value, plot_2D_or_3D = '3D', plot_separately = True, Z = None, sequence_of_diff=''):
+        if(type(Z) == type(None)): 
+            Z = self._Z_axis_
+            sequence_of_diff=''
+        Z = self.__get_Z_wrtX__(x_value, Z)
         label = 'f(x,y)|x='+str(x_value)
         if(plot_2D_or_3D.lower() == '2d'):
-            self.__plot_2D__(self._Y_axis_1D, Z, label, plot_separately)
+            self.__plot_2D__(self._Y_axis_1D, Z, label, len(sequence_of_diff), plot_separately)
         elif(plot_2D_or_3D.lower() == '3d'):
-            self.__plot_function_wrt__(self._Y_axis_1D, x_value, 'x', Z, label, plot_separately)
+            self.__plot_function_wrt__(self._Y_axis_1D, x_value, 'x', Z, label, len(sequence_of_diff), plot_separately)
         else: raise ValueError("'plot_2D_or_3D' must be either '2D' or '3D'")   
 
 # =============================================================================        
         
-    def plot_function_wrtY(self, y_value, plot_2D_or_3D = '3D', plot_separately = True):
-        Z = self.__get_Z_wrtY__(y_value)
+    def plot_function_wrtY(self, y_value, plot_2D_or_3D = '3D', plot_separately = True, Z = None, sequence_of_diff=''):
+        if(type(Z) == type(None)): 
+            Z = self._Z_axis_
+            sequence_of_diff=''
+        Z = self.__get_Z_wrtY__(y_value,Z)
         label = 'f(x,y)|y='+str(y_value)
         if(plot_2D_or_3D.lower() == '2d'):
-            self.__plot_2D__(self._X_axis_1D, Z, label, plot_separately)
+            self.__plot_2D__(self._X_axis_1D, Z, label, len(sequence_of_diff), plot_separately)
         elif(plot_2D_or_3D.lower() == '3d'):
-            self.__plot_function_wrt__(self._X_axis_1D, y_value, 'y', Z, label, plot_separately)
+            self.__plot_function_wrt__(self._X_axis_1D, y_value, 'y', Z, label, len(sequence_of_diff), plot_separately)
         else: raise ValueError("'plot_2D_or_3D' must be either '2D' or '3D'")   
 
 # =============================================================================        
 
-    def __diff_wrtX__(self, order_of_diff = 1):
+    def __diff_wrtX__(self, order_of_diff, Z):
         Z2 = []
         for y_value in self._Y_axis_1D:
-            Z2.append(self.__diff_wrtX_given_Y_order_n__(order_of_diff, y_value))
+            Z2.append(self.__diff_wrtX_given_Y_order_n__(order_of_diff, y_value, Z))
         return np.array(Z2)
     
-    def plot_diff_wrtX(self,order_of_diff = 1, plot_separately = True):
+    def plot_diff_wrtX(self,order_of_diff = 1, plot_separately = True, Z = None, sequence_of_diff=''):
+        if(type(Z) == type(None)): 
+            Z = self._Z_axis_
+            sequence_of_diff=''
         if(plot_separately): plt.figure()
-        Z = self.__diff_wrtX__(order_of_diff)
+        Z = self.__diff_wrtX__(order_of_diff, Z)
         #l = "".join(['x' for _ in range(order_of_diff)])
         #title1 = self._function_.__name__+'_'+l
         #l = "".join(['d('+_+')' for _ in l])
         title2 = 'd'+str(order_of_diff)+'('+self._function_.__name__+')/d'+str(order_of_diff)+'(x)'
-        self.__plot_3D_curve__(self._X_axis_, self._Y_axis_, Z,title2, diff_order=(order_of_diff, 0))
+        order = self.__get_order_by_sequence__(sequence_of_diff)
+        order = (order[0] + order_of_diff, order[1])
+        self.__plot_3D_curve__(self._X_axis_, self._Y_axis_, Z,title2, diff_order=order)
         
-    def __diff_wrtY__(self, order_of_diff = 1):
+    def __diff_wrtY__(self, order_of_diff, Z):
         Z2 = []
         for x_value in self._X_axis_1D:
-            Z2.append(self.__diff_wrtY_given_X_order_n__(order_of_diff, x_value))
+            Z2.append(self.__diff_wrtY_given_X_order_n__(order_of_diff, x_value, Z))
         return np.array(Z2).T
     
-    def plot_diff_wrtY(self, order_of_diff = 1, plot_separately = True):
+    def plot_diff_wrtY(self, order_of_diff = 1, plot_separately = True, Z = None, sequence_of_diff=''):
+        if(type(Z) == type(None)): 
+            Z = self._Z_axis_
+            sequence_of_diff=''
         if(plot_separately): plt.figure()
-        Z = self.__diff_wrtY__(order_of_diff)
+        Z = self.__diff_wrtY__(order_of_diff, Z)
         title = 'd'+str(order_of_diff)+'('+self._function_.__name__+')/d'+str(order_of_diff)+'(y)'
-        self.__plot_3D_curve__(self._X_axis_, self._Y_axis_, Z, title, diff_order=(0, order_of_diff))
+        order = self.__get_order_by_sequence__(sequence_of_diff)
+        order = (order[0], order_of_diff + order[1])
+        self.__plot_3D_curve__(self._X_axis_, self._Y_axis_, Z, title, diff_order=order)
 
 # =============================================================================
-
-    def __get_Z_wrtY_given_Z__(self, y_value, Z):
-        index = int(round((y_value - self._Y_axis_1D[0]) / self._dy_))
-        return Z[index]
-
-    def __get_Z_wrtX_given_Z__(self, x_value, Z):
-        index = int(round((x_value - self._X_axis_1D[0]) / self._dx_))
-        Z2 = []
-        for i in range(len(Z)):
-            Z2.append(Z[i][index])
-        return np.array(Z2)
 
     def __diff_wrtX_given_Z__(self, Z):
         Z2 = []
         for y_value in self._Y_axis_1D:
-            z = self.__get_Z_wrtY_given_Z__(y_value, Z)
+            z = self.__get_Z_wrtY__(y_value, Z)
             z = self.__diff__(self._X_axis_1D, z)
             Z2.append(z)
         return np.array(Z2)
@@ -227,16 +240,23 @@ class MultiVariable:
     def __diff_wrtY_given_Z__(self, Z):
         Z2 = []
         for x_value in self._X_axis_1D:
-            z = self.__get_Z_wrtX_given_Z__(x_value, Z)
+            z = self.__get_Z_wrtX__(x_value, Z)
             z = self.__diff__(self._Y_axis_1D, z)
             Z2.append(z)
         return np.array(Z2).T
     
-    def __diff_of_seq__(self,seq):
+    def __get_order_by_sequence__(self,seq):
+        xs,ys = 0,0
+        for s in seq:
+            if(s =='x'): xs += 1
+            else: ys += 1
+        return (xs,ys)
+    
+    def __diff_of_seq__(self, seq, Z):
         if(type(seq) != str): raise TypeError("type of sequence must be 'str'")
         for x in seq:
             if(x.lower() != 'x' and x.lower() != 'y'): raise ValueError("sequence must contain either 'x' or 'y'")
-        Z = self._Z_axis_.copy()
+        Z = Z.copy()
         for c in seq:
             if(c == 'x'):
                 Z = self.__diff_wrtX_given_Z__(Z)
@@ -244,38 +264,48 @@ class MultiVariable:
                 Z = self.__diff_wrtY_given_Z__(Z)
         return Z
     
-    def plot_diff_of_sequence(self, sequence, plot_separately = True):
+    def plot_diff_of_sequence(self, sequence, plot_separately = True, Z = None, sequence_of_diff=''):
+        if(type(Z) == type(None)): 
+            Z = self._Z_axis_
+            sequence_of_diff=''
         if(plot_separately): plt.figure()
-        Z = self.__diff_of_seq__(sequence)
+        Z = self.__diff_of_seq__(sequence, Z)
         #title = self._function_.__name__+'_'+sequence
         #l = "".join(['d('+_+')' for _ in sequence])
-        xs,ys = 0,0
-        for s in sequence:
-            if(s =='x'): xs += 1
-            else: ys += 1
+        xs,ys = self.__get_order_by_sequence__(sequence)
+        order = self.__get_order_by_sequence__(sequence_of_diff)
+        order = (order[0] + xs, order[1] + ys)
         title = 'd'+str(len(sequence))+'('+self._function_.__name__+')/'+'d'+str(xs)+'(x)d'+str(ys)+'(y)'
-        self.__plot_3D_curve__(self._X_axis_, self._Y_axis_, Z, title, diff_order=(xs,ys))
+        self.__plot_3D_curve__(self._X_axis_, self._Y_axis_, Z, title, diff_order=order)
         
 # =============================================================================        
 
-    def plot_diff_wrtY_given_X(self, x_value, order_of_diff = 1, plot_2D_or_3D = '3D', plot_separately = True):
-        Z = self.__diff_wrtY_given_X_order_n__(order_of_diff, x_value)
+    def plot_diff_wrtY_given_X(self, x_value, order_of_diff = 1, plot_2D_or_3D = '3D', plot_separately = True, Z = None, sequence_of_diff=''):
+        if(type(Z) == type(None)): 
+            Z = self._Z_axis_
+            sequence_of_diff=''
+        Z = self.__diff_wrtY_given_X_order_n__(order_of_diff, x_value, Z)
         label = "Diff(" + str(order_of_diff) + ')|x=' + str(x_value)
+        order = order_of_diff + len(sequence_of_diff)
         if(plot_2D_or_3D.lower() == '2d'):
-            self.__plot_2D__(self._Y_axis_1D, Z, label, order_of_diff, plot_separately)
+            self.__plot_2D__(self._Y_axis_1D, Z, label, order, plot_separately)
         elif(plot_2D_or_3D.lower() == '3d'):
-            self.__plot_function_wrt__(self._Y_axis_1D, x_value, 'x', Z, label, order_of_diff, plot_separately)
+            self.__plot_function_wrt__(self._Y_axis_1D, x_value, 'x', Z, label, order, plot_separately)
         else: raise ValueError("'plot_2D_or_3D' must be either '2D' or '3D'")
 
 # =============================================================================        
 
-    def plot_diff_wrtX_given_Y(self, y_value, order_of_diff = 1, plot_2D_or_3D = '3D', plot_separately = True):
-        Z = self.__diff_wrtX_given_Y_order_n__(order_of_diff, y_value)
+    def plot_diff_wrtX_given_Y(self, y_value, order_of_diff = 1, plot_2D_or_3D = '3D', plot_separately = True, Z = None, sequence_of_diff=''):
+        if(type(Z) == type(None)): 
+            Z = self._Z_axis_
+            sequence_of_diff=''
+        Z = self.__diff_wrtX_given_Y_order_n__(order_of_diff, y_value, Z)
         label = "Diff(" + str(order_of_diff) + ')|y=' + str(y_value)
+        order = order_of_diff + len(sequence_of_diff)
         if(plot_2D_or_3D.lower() == '2d'):
-            self.__plot_2D__(self._X_axis_1D , Z, label, order_of_diff, plot_separately)
+            self.__plot_2D__(self._X_axis_1D , Z, label, order, plot_separately)
         elif(plot_2D_or_3D.lower() == '3d'):
-            self.__plot_function_wrt__(self._X_axis_1D, y_value, 'y', Z, label, order_of_diff, plot_separately)
+            self.__plot_function_wrt__(self._X_axis_1D, y_value, 'y', Z, label, order, plot_separately)
         else: raise ValueError("'plot_2D_or_3D' must be either '2D' or '3D'")    
 
 # =============================================================================        
@@ -321,3 +351,34 @@ class MultiVariable:
         self.setX_limit(limit)
         self.setY_limit(limit)
         self.setZ_limit(limit)
+
+    def get_Z(self):
+        return self._Z_axis_.copy()
+    
+    def getZ_wrtX(self, x_value, Z = None):
+        if(type(Z) == type(None)): Z = self._Z_axis_
+        return self.__get_Z_wrtX__(x_value, Z)
+    
+    def getZ_wrtY(self, y_value, Z = None):
+        if(type(Z) == type(None)): Z = self._Z_axis_
+        return self.__get_Z_wrtY__(y_value, Z)
+    
+    def getZ_diff_of_sequence(self,sequence, Z = None):
+        if(type(Z) == type(None)): Z = self._Z_axis_
+        return self.__diff_of_seq__(sequence, Z)
+    
+    def getZ_diff_wrtX(self, order_of_diff=1, Z = None):
+        if(type(Z) == type(None)): Z = self._Z_axis_
+        return self.__diff_wrtX__(order_of_diff, Z)
+        
+    def getZ_diff_wrtY(self, order_of_diff=1, Z = None):
+        if(type(Z) == type(None)): Z = self._Z_axis_
+        return self.__diff_wrtY__(order_of_diff, Z)
+        
+    def getZ_diff_wrtX_given_Y(self, y_value, order_of_diff=1, Z = None):
+        if(type(Z) == type(None)): Z = self._Z_axis_
+        return self.__diff_wrtX_given_Y_order_n__(order_of_diff, y_value, Z)
+    
+    def getZ_diff_wrtY_given_X(self, x_value, order_of_diff=1, Z = None):
+        if(type(Z) == type(None)): Z = self._Z_axis_
+        return self.__diff_wrtY_given_X_order_n__(order_of_diff, x_value, Z)
